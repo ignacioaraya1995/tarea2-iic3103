@@ -1,21 +1,29 @@
 from flask import Flask, jsonify, request
 from flask_pymongo import PyMongo
 
-idBurgerCounter = 1
-idIngretCounter = 1
+def createID(element):
+    idlist = []
+    for e in element.find():
+        idlist.append(e["id"])
+    for i in range(1,10000):
+        if i not in idlist:
+            return i
+
+
+
 URL = "https://tarea2-iic3103-araya.herokuapp.com"
 
 app = Flask(__name__)
-app.config['MONGO_DBNAME'] = 't2'
-app.config['MONGO_URI'] = 'mongodb+srv://ignacioaraya:gamecube123@tarea2-uv28d.mongodb.net/t2?retryWrites=true&w=majority'
+app.config['MONGO_DBNAME'] = 'heroku_st9ndd6k'
+app.config['MONGO_URI'] = 'mongodb://ignacio:iic3103@ds145916.mlab.com:45916/heroku_st9ndd6k?RetryWrites=false'
 mongo = PyMongo(app)
-
     
 ########### HAMBURGUESAS ###########
 
 # [GET] HAMBURGUESAS
 @app.route('/hamburguesa', methods=['GET'])
 def getBurgers():
+    print("\n[GET] HAMBURGUESAS\n")
     burgers = mongo.db.burger
     output = []
     for b in burgers.find():
@@ -25,10 +33,9 @@ def getBurgers():
 # [POST] HAMBURGUESAS
 @app.route('/hamburguesa', methods=['POST'])
 def addBurger():
+    print("\n[POST] HAMBURGUESAS\n")
     burgers = mongo.db.burger
-    global idBurgerCounter
-    id = idBurgerCounter
-    idBurgerCounter +=1
+    id = createID(burgers)
     nombre = request.json["nombre"]
     precio = request.json["precio"]
     descripcion = request.json["descripcion"]
@@ -45,6 +52,7 @@ def addBurger():
 # [GET] HAMBURGUESAS POR ID
 @app.route('/hamburguesa/<int:id>', methods=['GET'])
 def getBurger(id):
+    print("\n[GET] HAMBURGUESAS POR ID\n")
     burgers = mongo.db.burger
     b = burgers.find_one({"id": id})
     if type(id) != type(1):
@@ -60,6 +68,7 @@ def getBurger(id):
 # [DELETE] HAMBURGUESA POR ID
 @app.route('/hamburguesa/<int:id>', methods=['DELETE'])
 def deleteBurger(id):
+    print("\n[DELETE] HAMBURGUESA POR ID\n")
     burgers = mongo.db.burger
     b = burgers.find_one({"id": id})
     if type(id) != type(1):
@@ -73,6 +82,7 @@ def deleteBurger(id):
 # [PATCH] ACTUALIZAR HAMBURGUESA POR ID
 @app.route('/hamburguesa/<int:id>', methods=['PATCH'])
 def updateBurger(id):
+    print("\n[PATCH] ACTUALIZAR HAMBURGUESA POR ID\n")
     burgers = mongo.db.burger
     b = burgers.find_one({"id": id})
     nombre = request.json["nombre"]
@@ -96,19 +106,19 @@ def updateBurger(id):
 # [GET] INGREDIENTES
 @app.route('/ingrediente', methods=['GET'])
 def getIngredients():
+    print("\n[GET] INGREDIENTES\n")
     ingredientes = mongo.db.ingredient
     output = []
     for b in ingredientes.find():
         output.append({"id": b["id"], "nombre": b["nombre"], "descripcion": b["descripcion"]})
     return jsonify(output),200
 
-# [POST] INGREDIENTE (Revisar)
+# [POST] INGREDIENTE
 @app.route('/ingrediente', methods=['POST'])
 def addIngredient():
+    print("\n[POST] INGREDIENTE\n")
     ingredientes = mongo.db.ingredient
-    global idIngretCounter
-    id = idIngretCounter
-    idIngretCounter +=1
+    id = createID(ingredientes)
     nombre = request.json["nombre"]
     descripcion = request.json["descripcion"]
     if nombre == "" or descripcion == "" or type(nombre) != type("string") or type(descripcion) != type("string"):
@@ -119,9 +129,10 @@ def addIngredient():
         output = {"id": newingrediente2["id"], "nombre": newingrediente2["nombre"], "descripcion": newingrediente2["descripcion"]}
         return jsonify(output),201
 
-# [GET] INGREDIENTES POR ID (Le falta el error 404 y 400)
+# [GET] INGREDIENTES POR ID
 @app.route('/ingrediente/<int:id>', methods=['GET'])
 def getIngrediente(id):
+    print("\n[GET] INGREDIENTES POR ID\n")
     ingredientes = mongo.db.ingredient
     i = ingredientes.find_one({"id": id})
     if type(id) != type(1):
@@ -137,6 +148,7 @@ def getIngrediente(id):
 # [DELETE] INGREDIENTE POR ID
 @app.route('/ingrediente/<int:id>', methods=['DELETE'])
 def deleteIngrediente(id):
+    print("\n[DELETE] INGREDIENTE POR ID\n")
     ingredientes = mongo.db.ingredient
     i = ingredientes.find_one({"id": id})
     if type(id) != type(1):
@@ -157,6 +169,7 @@ def deleteIngrediente(id):
 # [DELETE] Remove an INGREDIENTE to a HAMBURGESA
 @app.route('/hamburguesa/<int:idH>/ingrediente/<int:idI>', methods=["DELETE"])
 def removeIngredienteFromBurger(idH, idI):
+    print("\n[DELETE] Remove an INGREDIENTE to a HAMBURGESA\n")
     burgers = mongo.db.burger
     b = burgers.find_one({"id": idH})
     ingredientes = mongo.db.ingredient
@@ -176,6 +189,7 @@ def removeIngredienteFromBurger(idH, idI):
 # [PUT] Add an INGREDIENTE to a HAMBURGESA
 @app.route('/hamburguesa/<int:idH>/ingrediente/<int:idI>', methods=["PUT"])
 def addIngredienteToBurger(idH, idI):
+    print("\n[PUT] Add an INGREDIENTE to a HAMBURGESA\n")
     burgers = mongo.db.burger
     b = burgers.find_one({"id": idH})
     ingredientes = mongo.db.ingredient
@@ -194,4 +208,5 @@ def addIngredienteToBurger(idH, idI):
     else:
         return "Agreado de forma exitosa", 201
 
-app.run()
+if __name__ == '__main__':
+    app.run()
