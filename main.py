@@ -3,7 +3,7 @@ from flask_pymongo import PyMongo
 
 idBurgerCounter = 1
 idIngretCounter = 1
-URL = "heroku"
+URL = "https://tarea2-iic3103-araya.herokuapp.com"
 
 app = Flask(__name__)
 app.config['MONGO_DBNAME'] = 't2'
