@@ -36,11 +36,14 @@ def addBurger():
     print("\n[POST] HAMBURGUESAS\n")
     burgers = mongo.db.burger
     id = createID(burgers)
-    nombre = request.json["nombre"]
-    precio = request.json["precio"]
-    descripcion = request.json["descripcion"]
-    imagen = request.json["imagen"]
-    ingredientes = []
+    try:
+        nombre = request.json["nombre"]
+        precio = request.json["precio"]
+        descripcion = request.json["descripcion"]
+        imagen = request.json["imagen"]
+        ingredientes = []
+    except KeyError:
+        return "Input Invalido",400
     if nombre == "" or type(nombre) != type("string") or precio == "" or type(precio) != type(1) or descripcion == "" or type(descripcion) != type("string") or imagen == "" or type(imagen) != type("string"):
         return "Input Invalido",400
     else:
@@ -119,15 +122,18 @@ def addIngredient():
     print("\n[POST] INGREDIENTE\n")
     ingredientes = mongo.db.ingredient
     id = createID(ingredientes)
-    nombre = request.json["nombre"]
-    descripcion = request.json["descripcion"]
-    if nombre == "" or descripcion == "" or type(nombre) != type("string") or type(descripcion) != type("string"):
-        return "Input Invalido",400
-    else:
+    try:
+        nombre = request.json["nombre"]
+        descripcion = request.json["descripcion"]
+    except KeyError:
+        return "Input Invalido",400 
+    if nombre != "" and descripcion != "" and type(nombre) == type("string") and type(descripcion) == type("string"):
         newingrediente = ingredientes.insert({"id": id, "nombre": nombre, "descripcion": descripcion})
         newingrediente2 = ingredientes.find_one({'_id': newingrediente})
         output = {"id": newingrediente2["id"], "nombre": newingrediente2["nombre"], "descripcion": newingrediente2["descripcion"]}
         return jsonify(output),201
+    else:
+        return "Input Invalido",400
 
 # [GET] INGREDIENTES POR ID
 @app.route('/ingrediente/<int:id>', methods=['GET'])
