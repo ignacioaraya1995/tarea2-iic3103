@@ -179,7 +179,7 @@ def deleteIngrediente(id):
         return "ingrediente inexistente",404
     else:
         burgers = mongo.db.burger
-        delIng = URL + "/ingrediente/" + str(id)
+        delIng ={"path": URL + "/ingrediente/" + str(id)}
         for b in burgers.find():
             if delIng in b["ingredientes"]:
                 return "Ingrediente no se puede borrar, se encuentra presente en una hamburguesa",409
@@ -201,7 +201,7 @@ def removeIngredienteFromBurger(idH, idI):
     if i == None:
         return "Ingrediente inexistente en la hamburguesa",404
     global URL
-    newIng = URL + "/ingrediente/" + str(idI)
+    newIng = {"path" : URL + "/ingrediente/" + str(idI)}
     if newIng not in b["ingredientes"]:
         return "Ingrediente inexistente en la hamburguesa",404
     else:
