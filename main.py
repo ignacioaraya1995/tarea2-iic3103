@@ -88,10 +88,26 @@ def updateBurger(id):
     print("\n[PATCH] ACTUALIZAR HAMBURGUESA POR ID\n")
     burgers = mongo.db.burger
     b = burgers.find_one({"id": id})
-    nombre = request.json["nombre"]
-    precio = request.json["precio"]
-    descripcion = request.json["descripcion"]
-    imagen = request.json["imagen"]
+    nombre = b["nombre"]
+    precio = b["precio"]
+    descripcion = b["descripcion"]
+    imagen = b["imagen"]
+    try:
+        nombre = request.json["nombre"]
+    except:
+        pass
+    try:
+        precio = request.json["precio"]
+    except:
+        pass
+    try:
+        descripcion = request.json["descripcion"]
+    except:
+        pass
+    try:
+        imagen = request.json["imagen"]
+    except:
+        pass
     if type(id) != type(1):
         return "Parámetros inválidos", 400
     if b == None:
@@ -207,7 +223,7 @@ def addIngredienteToBurger(idH, idI):
     if i == None:
         return "Ingrediente inexsistente",404
     global URL
-    newIng = URL + "/ingrediente/" + str(idI)
+    newIng = {"path": URL + "/ingrediente/" + str(idI)}
     if newIng not in b["ingredientes"]:
         burgers.update({ "id": idH },{ "$push": { "ingredientes": newIng }})
         return "Agreado de forma exitosa", 201
